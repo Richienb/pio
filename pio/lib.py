@@ -7,12 +7,14 @@ try:
 except ImportError:
     from pip._internal import main as pipmain
 
+def getLatestVersion(package):
+    releases = list(requests.get("https://pypi.org/pypi/{}/json".format(i[1])).json()["releases"].keys())
+    releases.sort(key=StrictVersion)
+    return releases[-1]
+    
 def add(arguments, cwd):
     for i in enumerate(arguments):
-        releases = list(requests.get("https://pypi.org/pypi/{}/json".format(i[1])).json()["releases"].keys())
-        releases.sort(key=StrictVersion)
-        latest = releases[-1]
-        content = "{}~={}".format(i[1], latest)
+        content = "{}~={}".format(i[1], getLatestVersion(i[1]))
         pipmain(['install', content])
         # TODO: Check if already appended
         with open(path.join(cwd, "requirements.txt"), "a") as f:
