@@ -22,3 +22,13 @@ pio install # Install all packages from pio.json
 ```sh
 pio migrate requirements.txt
 ```
+
+## Programmatic usage
+
+```python
+import pio # Import PIO package
+pio.add("example") # Install example package
+pio.remove("example") # Remove example package
+pio.upgrade("example") # Upgrade example package (leave blank to upgrade all)
+pio.install() # Install all packages from pio.json
+```
