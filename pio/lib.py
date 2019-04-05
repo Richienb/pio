@@ -12,13 +12,17 @@ except ImportError:
     from pip._internal import main as pipmain
 
 
+def getLatestVersion(package):
+    releases = list(
+        requests.get("https://pypi.org/pypi/{}/json".format(
+            i[1])).json()["releases"].keys())
+    releases.sort(key=StrictVersion)
+    return releases[-1]
+
+
 def add(args, cwd):
     for i in enumerate(args):
-        releases = list(
-            requests.get("https://pypi.org/pypi/{}/json".format(
-                i[1])).json()["releases"].keys())
-        releases.sort(key=StrictVersion)
-        latest = releases[-1]
+        latest = getLatestVersion(i[1])
 
         pipmain(['install', "{}~={}".format(i[1], latest)])
 
