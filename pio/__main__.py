@@ -2,21 +2,15 @@ import click
 
 from os import getcwd
 
-from . import lib
+import pio as lib
 
 
 @click.command()
-@click.argument('option', nargs=1)
-@click.argument('arguments', nargs=-1)
+@click.argument("option", nargs=1)
+@click.argument("arguments", nargs=-1)
 def handler(option, arguments):
-    d = {
-        'add': lib.add,
-        'remove': lib.remove,
-        'install': lib.install,
-        'update': lib.update
-    }
-    d.get(option)(arguments, getcwd())
+    getattr(lib, option)(getcwd(), arguments)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     handler()
