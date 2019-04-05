@@ -1,0 +1,62 @@
+dist:                              xenial
+
+language:                          python
+
+python:
+    - 3.4
+    - 3.5
+    - 3.6
+    - 3.7
+    - 3.8-dev
+
+cache:                             pip
+
+before_install:
+    - git remote set-url origin https://Richienb:${github_token}@github.com/Richienb/pio.git
+    - git config --global user.name "ROS Bot"
+    - git config --global user.email "richiebendall@gmail.com"
+
+install:
+    - pip install -r requirements.txt
+    - pip install codecov vulture
+
+script:
+    - cd pio
+    - find . -type f -name "*.py" -exec vulture {} --min-confidence 70 \;
+    - coverage run __init__.py -v
+
+after_success:
+    - codecov
+
+jobs:
+    include:
+        - stage:                   deploy
+
+          python:                  3.7
+
+          if:                      type != pull_request AND tag IS present
+
+          install:
+              - pip install setuptools-git-version
+
+          script:                  true
+
+          deploy:
+              - provider:          pypi
+                user:              "Richienb"
+                password:          $pypi_password
+                skip_cleanup:      true
+                server:            https://test.pypi.org/legacy/
+                distributions:     "sdist bdist_wheel"
+                on:
+                    all_branches:  true
+
+              - provider:          pypi
+                user:              "Richienb"
+                password:          $pypi_password
+                skip_cleanup:      true
+                distributions:     "sdist bdist_wheel"
+                on:
+                    all_branches:  true
+
+          after_success:           true
