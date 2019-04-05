@@ -1,3 +1,4 @@
 click~=7.0
 requests~=2.21.0
-quilt-lang~=0.11.1
+requirements-parser~=0.2.0
+readsettings~=3.0.1

@@ -1,32 +1,44 @@
 import requests
 from os import path
 from distutils.version import StrictVersion
+import requirements
+import json
+from readsettings import ReadSettings
+data = ReadSettings("pio.json")
 
 try:
     from pip import main as pipmain
 except ImportError:
     from pip._internal import main as pipmain
 
-def add(arguments, cwd):
-    for i in enumerate(arguments):
-        releases = list(requests.get("https://pypi.org/pypi/{}/json".format(i[1])).json()["releases"].keys())
+
+def add(args, cwd):
+    for i in enumerate(args):
+        releases = list(
+            requests.get("https://pypi.org/pypi/{}/json".format(
+                i[1])).json()["releases"].keys())
         releases.sort(key=StrictVersion)
         latest = releases[-1]
-        content = "{}~={}".format(i[1], latest)
-        pipmain(['install', content])
-        # TODO: Check if already appended
-        with open(path.join(cwd, "requirements.txt"), "a") as f:
-            f.write("\n" + content)
-            
-def remove(arguments, cwd):
-    for i in enumerate(arguments):
+
+        pipmain(['install', "{}~={}".format(i[1], latest)])
+
+        data.set(i[1], latest)
+
+
+def remove(args, cwd):
+    for i in enumerate(args):
         pipmain(['uninstall', i[1]])
-        # TODO: Remove entry
-        
-def install(cwd):
-    pass
-	# TODO: Create installer
-    
+        data.rem(i[1])
+
+
+def install(args, cwd):
+    for key in data.raw().keys():
+        pair = (key, data.raw()[key])
+        pipmain(['install', "{}~={}".format(pair[0], pair[1])])
+
+
 def update(cwd):
     pass
-	# TODO: Create updater
+
+
+# TODO: Create updater
