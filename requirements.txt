@@ -1,4 +1,4 @@
 click~=7.0
-requests~=2.21.0
+requests~=2.23.0
 requirements-parser~=0.2.0
 readsettings~=3.4.5
